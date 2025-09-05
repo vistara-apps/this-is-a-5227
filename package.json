@@ -17,7 +17,8 @@
     "openai": "^4.28.0",
     "axios": "^1.6.0",
     "framer-motion": "^10.16.16",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "@stripe/stripe-js": "^2.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
