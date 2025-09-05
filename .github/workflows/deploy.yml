@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Build and Deploy
 
 on:
   push:
@@ -19,16 +19,25 @@ jobs:
         node-version: '22'
         cache: 'npm'
         
-        - name: Install dependencies
-      run: npm install
+    - name: Install dependencies
+      run: npm ci
 
     - name: Build application
       run: npm run build
       env:
         NODE_OPTIONS: --max-old-space-size=4096
         
+    - name: Check Vercel Configuration
+      if: secrets.VERCEL_TOKEN == ''
+      run: |
+        echo "⚠️ Vercel deployment skipped - VERCEL_TOKEN secret not configured"
+        echo "To enable Vercel deployment, add the following secrets to your repository:"
+        echo "- VERCEL_TOKEN"
+        echo "- VERCEL_ORG_ID"
+        echo "- VERCEL_PROJECT_ID"
+        
     - name: Deploy to Vercel (Production)
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && secrets.VERCEL_TOKEN != ''
       uses: amondnet/vercel-action@v25
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -37,7 +46,7 @@ jobs:
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         
     - name: Deploy to Vercel (Preview)
-      if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
+      if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && secrets.VERCEL_TOKEN != ''
       uses: amondnet/vercel-action@v25
       with:
         vercel-token: ${{ secrets.VERCEL_TOKEN }}
